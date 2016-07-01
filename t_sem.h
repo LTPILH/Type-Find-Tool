@@ -5,7 +5,7 @@
 #include <sys/types.h>
 
 #define SEM_RESOURCE_MAX 1
-#define SEMMSL 1
+#define SEMMSL 2
 
 union semun
 {
