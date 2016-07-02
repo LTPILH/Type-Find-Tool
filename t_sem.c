@@ -81,6 +81,3 @@ int getval(int sid, int member) {
 	semval = semctl(sid, member, GETVAL, 0);
 	return semval;
 }
-int main() {
-	return 0;
-}
