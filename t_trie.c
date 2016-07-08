@@ -33,6 +33,9 @@ int t_trie_insert(char *name, int len) { // -1 exist
 	if(len <= 0) return -1;
 	int i, u = 0, preu;
 	key_t key = ftok(".", 's');
+	if(excrshm(key) == -1) {
+		t_trie_init();
+	}
 	int shmid = getshm(key);
 	int exist = -1;
 	int sz = *(int *)readsem(shmid, 0, sizeof(int));

@@ -1,5 +1,14 @@
 #include "t_shm.h"
 
+int excrshm(key_t key) {
+	int shmid = -1;
+	if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
 int getshm(key_t key) {
 	int shmid = -1;
 	if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
