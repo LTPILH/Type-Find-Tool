@@ -2,7 +2,6 @@
 #include "t_trie.h"
 #include <dirent.h>
 
-void fbuild(char *file_path) {
 int main(int argc, char *argv[]) {
 	if(argc < 2) usage();
 	if(strncmp(argv[1], "-b", 2) == 0) {
@@ -21,22 +20,24 @@ int main(int argc, char *argv[]) {
 				char *newfile = (char *)malloc(len + strlen(pdirent->d_name) + 1);
 				int sz = snprintf(newfile, sizeof(char), "%s/%s", argv[2], pdirent->d_name);
 				newfile[sz] = 0;
-				......;
-				int pid;
-				if((pid = fork()) < 0) {
-					perror("t_fbuild fork: ");
-					exit(1);
-				}
-				else if(pid == 0) {
-					if(execlp(argv[0], argv[0], argv[1], newfile, NULL) == -1) {
-						perror("t_fbuild execlp: ");
+				int ex = t_trie_insert(newfile, sz);
+				if(ex == 0) {
+					int pid;
+					if((pid = fork()) < 0) {
+						perror("t_fbuild fork: ");
 						exit(1);
+					}
+					else if(pid == 0) {
+						if(execlp(argv[0], argv[0], argv[1], newfile, NULL) == -1) {
+							perror("t_fbuild execlp: ");
+							exit(1);
+						}
 					}
 				}
 			}
 		}
 		else if(t_ftype(argv[2]) == S_IFREG && len >= 3 && argv[2][len - 2] == '.' && (argv[2][len - 1] == 'c' || argv[2][len - 1] == 'h')) {
-			......
+			printf("%s\n", argv[2]);
 		}
 	}
 	else if(strncmp(argv[1], "-h", 2) == 0) {
