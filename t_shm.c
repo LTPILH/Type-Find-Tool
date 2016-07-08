@@ -21,14 +21,14 @@ int getshm(key_t key) {
 	return shmid;
 }
 char *openshm(int shmid) {
-	char *segptr = -1;
-	if((segptr = shmat(shid, 0, 0)) == -1) {
+	char *segptr = NULL;
+	if(*(segptr = shmat(shmid, 0, 0)) == -1) {
 		perror("t_shm shmat: ");
 		exit(1);
 	}
 }
 
-writeshm(int shmid, int mv, char *text, int len) {
+void writeshm(int shmid, int mv, char *text, int len) {
 	char *segptr = openshm(shmid);
 	strncpy(segptr + mv, text, len);
 }
@@ -43,7 +43,7 @@ char *readshm(int shmid, int mv, int len) {
 	buf[len] = '\0';
 	return buf;
 }
-removeshm(int shmid) {
+void removeshm(int shmid) {
 	if(shmctl(shmid, IPC_RMID, 0) == -1) {
 		perror("t_shm shmctl: ");
 		exit(1);

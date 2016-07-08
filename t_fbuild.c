@@ -1,6 +1,9 @@
 #include "t_foperator.h"
 #include "t_trie.h"
+#include <unistd.h>
 #include <dirent.h>
+
+void usage();
 
 int main(int argc, char *argv[]) {
 	if(argc < 2) usage();

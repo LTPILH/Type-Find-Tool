@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <strings.h>
+#include <string.h>
 
 #define SEGSIZE 20000000 
 

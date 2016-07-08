@@ -38,9 +38,9 @@ int t_trie_insert(char *name, int len) { // -1 exist
 	}
 	int shmid = getshm(key);
 	int exist = -1;
-	int sz = *(int *)readsem(shmid, 0, sizeof(int));
-	int *rdcnt = (int *)readsem(shmid, sizeof(int), sizeof(int));
-	int semid = *(int *)readsem(shmid, sizeof(int)*2, sizeof(int));
+	int sz = *(int *)readshm(shmid, 0, sizeof(int));
+	int *rdcnt = (int *)readshm(shmid, sizeof(int), sizeof(int));
+	int semid = *(int *)readshm(shmid, sizeof(int)*2, sizeof(int));
 	locksem(semid, 0);
 	if(*rdcnt == 0) locksem(semid, 1);
 	*rdcnt++;
@@ -78,7 +78,7 @@ int t_trie_insert(char *name, int len) { // -1 exist
 		}
 		int cnt = t_trie_getval(shmid, preu, c, 1);
 		t_trie_setval(shmid, preu, c, 1, cnt + 1);
-		writesem(shmid, 0, (char *)&sz, sizeof(int));
+		writeshm(shmid, 0, (char *)&sz, sizeof(int));
 		unlocksem(semid, 1);
 		return 0;
 	}
