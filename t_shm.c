@@ -26,6 +26,7 @@ char *openshm(int shmid) {
 		perror("t_shm shmat: ");
 		exit(1);
 	}
+	return segptr;
 }
 
 void writeshm(int shmid, int mv, char *text, int len) {
@@ -39,9 +40,20 @@ void zeroshm(int shmid, int mv, int len) {
 char *readshm(int shmid, int mv, int len) {
 	char *segptr = openshm(shmid);
 	char *buf = (char *)malloc(len + 1);
+	if(buf == NULL) {
+		fprintf(stderr, "t_shm readshm: malloc failed\n");
+	}
 	strncpy(buf, segptr + mv, len);
 	buf[len] = '\0';
 	return buf;
+}
+int getsize(int shmid) {
+	struct shmid_ds buf;
+	if(shmctl(shmid, IPC_STAT, &buf) == -1) {
+		perror("t_shm getsize: ");
+		exit(1);
+	}
+	return buf.shm_segsz;
 }
 void removeshm(int shmid) {
 	if(shmctl(shmid, IPC_RMID, 0) == -1) {

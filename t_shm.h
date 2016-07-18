@@ -7,6 +7,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <string.h>
+#include <unistd.h>
 
 #define SEGSIZE 20000000 
 
@@ -16,6 +17,7 @@ char *openshm(int shmid);
 void writeshm(int shmid, int mv, char *text, int len);
 void zeroshm(int shmid, int mv, int len);
 char *readshm(int shmid, int mv, int len);
+int getsize(int shmid);
 void removeshm(int shmid);
 
 #endif

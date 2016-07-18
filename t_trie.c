@@ -12,17 +12,16 @@ void t_trie_init() {
 	writeshm(shmid, sizeof(sz), (char *)&rdcnt, sizeof(rdcnt));
 	int semid;
 	createsem(&semid, key, 3); // 0 - read, 1 - write, 2 - add cnt
-	writeshm(shmid, sizeof(sz) + sizeof(rdcnt), (char *)&semid, sizeof(semid));
-	zeroshm(shmid, sizeof(sz) + sizeof(rdcnt) + sizeof(semid), sigma_size * 2);
+	zeroshm(shmid, sizeof(sz) + sizeof(rdcnt), sigma_size * 2);
 }
 
 int t_trie_getval(int shmid, int i, int j, int k) {
-	char *buf = readshm(shmid, sizeof(int)*(3+i*sigma_size*2+j*2+k), sizeof(int));
+	char *buf = readshm(shmid, sizeof(int)*(2+i*sigma_size*2+j*2+k), sizeof(int));
 	return *(int *)buf;
 }
 
 void t_trie_setval(int shmid, int i, int j, int k, int v) {
-	writeshm(shmid, sizeof(int)*(3+i*sigma_size*2+j*2+k), (char *)&v, sizeof(int));
+	writeshm(shmid, sizeof(int)*(2+i*sigma_size*2+j*2+k), (char *)&v, sizeof(int));
 }
 
 int t_trie_idx(char c) {
@@ -33,14 +32,13 @@ int t_trie_insert(char *name, int len) { // -1 exist
 	if(len <= 0) return -1;
 	int i, u = 0, preu;
 	key_t key = ftok(".", 's');
-	if(excrshm(key) == -1) {
-		t_trie_init();
-	}
 	int shmid = getshm(key);
 	int exist = -1;
-	int sz = *(int *)readshm(shmid, 0, sizeof(int));
+	int *sz = (int *)readshm(shmid, 0, sizeof(int));
 	int *rdcnt = (int *)readshm(shmid, sizeof(int), sizeof(int));
-	int semid = *(int *)readshm(shmid, sizeof(int)*2, sizeof(int));
+	int semid;
+	opensem(&semid, key);
+	fprintf(stderr, "name=%s, semid=%d, sz=%d, rdcnt=%d, shmid=%d\n\n", name, semid, (*sz), (*rdcnt), shmid);
 	locksem(semid, 0);
 	if(*rdcnt == 0) locksem(semid, 1);
 	*rdcnt++;
@@ -70,15 +68,14 @@ int t_trie_insert(char *name, int len) { // -1 exist
 		}
 		while(i < len) {
 			c = t_trie_idx(name[i]);
-			zeroshm(shmid, sizeof(int)*3+sz*sigma_size*2, sigma_size * 2);
-			t_trie_setval(shmid, u, c, 0, sz);
+			zeroshm(shmid, sizeof(int)*2+(*sz)*sigma_size*2, sigma_size * 2);
 			preu = u;
-			u = sz++;
+			u = (*sz)++;
 			i++;
 		}
 		int cnt = t_trie_getval(shmid, preu, c, 1);
 		t_trie_setval(shmid, preu, c, 1, cnt + 1);
-		writeshm(shmid, 0, (char *)&sz, sizeof(int));
+		writeshm(shmid, 0, (char *)sz, sizeof(int));
 		unlocksem(semid, 1);
 		return 0;
 	}
@@ -86,10 +83,20 @@ int t_trie_insert(char *name, int len) { // -1 exist
 	*rdcnt--;
 	if(*rdcnt == 0) unlocksem(semid, 1);
 	unlocksem(semid, 0);
-	locksem(semid, 2);
+	locksem(semid, 1);
 	int cnt = t_trie_getval(shmid, preu, c, 1);
 	t_trie_setval(shmid, preu, c, 1, cnt + 1);
 	int ret = (cnt == 0 ? 0 : -1);
-	unlocksem(semid, 2);
+	unlocksem(semid, 1);
 	return ret;
+}
+void t_trie_free() {
+	key_t key = ftok(".", 's');
+	int shmid = getshm(key);
+	printf("remove shmid=%d\n", shmid);
+	removeshm(shmid);
+	int semid;
+	opensem(&semid, key);
+	printf("remove semid=%d\n", semid);
+	removesem(semid);
 }
