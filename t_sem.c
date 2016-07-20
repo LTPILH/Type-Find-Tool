@@ -18,8 +18,12 @@ void createsem(int *sid, key_t key, int members) {
 		exit(1);
 	}
 	if((*sid = semget(key, members, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
-		fprintf(stderr, "Semaphore set already exists!\n");
-		exit(1);
+		opensem(sid, key);
+		removesem(*sid);
+		if((*sid = semget(key, members, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
+			fprintf(stderr, "Semaphore set already exists!\n");
+			exit(1);
+		}
 	}
 	semopts.val = SEM_RESOURCE_MAX;
 	for(cntr = 0; cntr < members; cntr++)
@@ -70,7 +74,7 @@ unsigned short get_member_count(int sid) {
 	semopts.buf = &mysemds;
 
 	if(semctl(sid, 0, IPC_STAT, semopts) == -1) {
-		perror("t_sem get_member_count: ");
+		perror("t_sem get_member_count");
 		exit(1);
 	}
 	return semopts.buf->sem_nsems;

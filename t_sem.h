@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 #define SEM_RESOURCE_MAX 1
-#define SEMMSL 3
+#define SEMMSL 1
 
 union semun
 {

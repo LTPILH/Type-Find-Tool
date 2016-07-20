@@ -1,0 +1,5 @@
+t_shm   shmat   :   file exist
+	每当子进程结束，我调用shmdt断开共享内存的映射，好像就没事了
+
+对t_file_path_index的写会乱
+	把t_man的"rt+" -> "rt", t_fbuild的"at+" -> "at", 好像就没事了

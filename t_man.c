@@ -1,9 +1,10 @@
 #include "t_trie.h"
 #include "t_foperator.h"
+#include "t_fbuild.h"
 #include <signal.h>
 
 void usage();
-int son_pro;
+int clo_son, all_son;
 
 int main(int argc, char *argv[]) {
 	if(argc == 1) usage();
@@ -11,39 +12,52 @@ int main(int argc, char *argv[]) {
 	if(strncmp(argv[1], "-b", 2) == 0) {
 		if(argc != 3) usage();
 		int pid;
-		son_pro = 0;
+		all_son = clo_son = 0;
 		void sig_chld(int);
 		signal(SIGCHLD, sig_chld);
-		void sig_int(int);
-		signal(SIGINT, sig_int);
 		t_fclear(T_FILE_PATH_INDEX);
-		FILE *idxfp = t_fopen(T_FILE_PATH_INDEX, "rt+");
+		FILE *idxfp = t_fopen(T_FILE_PATH_INDEX, "rt");
 		t_trie_init();
 		char pathname[LINESIZE];
 		strncpy(pathname, argv[2], sizeof(pathname));
 		while(1) {
 			int pathlen = strlen(pathname);
 			while(pathname[pathlen - 1] == '\n') pathname[--pathlen] = 0;
+			++all_son;
 			pid = fork();
-			son_pro++;
 			if(pid < 0) {
 				perror("tman fork: ");
 				t_trie_free();
+				t_fclose(idxfp);
 				exit(1);
 			}
 			else if(pid == 0) {
-				if(execlp("./t_fbuild", "./t_fbuild", pathname, NULL) == -1) {
-					perror("t_man execlp: ");
-					exit(1);
-				}
+				t_fclose(idxfp);
+				t_fbuild(pathname);
+				exit(0);
 			}
 			else {
-				//fprintf(stderr, "Create : %d, path=%s\n", pid, pathname);
-				while(t_freadline(pathname, LINESIZE, idxfp) == NULL) {
-					if(son_pro > 0) continue;
-					t_trie_free();
-					exit(0);
-				}
+				//fprintf(stderr, "Create : %d, path=%s, all_son=%d, ftell=%d\n", pid, pathname, all_son, ftell(idxfp));
+				char *ptr;
+				do {
+					//t_flock(idxfp);
+					ptr = t_freadline(pathname, LINESIZE, idxfp);
+					//printf("Before clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
+					//ptr = fgets(pathname, LINESIZE, idxfp);
+					//t_funlock(idxfp);
+					if(ptr == NULL) {
+						//printf("clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
+						if(clo_son < all_son) {
+							sleep(500);
+						}
+						else {
+							t_trie_free();
+							t_fclose(idxfp);
+							exit(0);
+						}
+					}
+					//printf("After clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
+				}while(ptr == NULL);
 				//fprintf(stderr, "Readline : %s\n", pathname);
 			}
 		}
@@ -53,13 +67,8 @@ void sig_chld(int signo) {
 	pid_t pid;
 
 	while((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
-		son_pro--;
-		//fprintf(stderr, "Delete : %d\n", pid);
+		++clo_son;
 	}
-}
-void sig_int(int signo) {
-	t_trie_free();
-	exit(1);
 }
 void usage() {
 	fprintf(stderr, "tman - A type find tool\n");

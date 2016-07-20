@@ -1,14 +1,5 @@
 #include "t_shm.h"
 
-int excrshm(key_t key) {
-	int shmid = -1;
-	if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
-		return 0;
-	}
-	else {
-		return -1;
-	}
-}
 int getshm(key_t key) {
 	int shmid = -1;
 	if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
@@ -23,22 +14,18 @@ int getshm(key_t key) {
 char *openshm(int shmid) {
 	char *segptr = NULL;
 	if(*(segptr = shmat(shmid, 0, 0)) == -1) {
-		perror("t_shm shmat: ");
+		perror("t_shm shmat");
 		exit(1);
 	}
 	return segptr;
 }
-
-void writeshm(int shmid, int mv, char *text, int len) {
-	char *segptr = openshm(shmid);
+void writeshm(char *segptr, int mv, char *text, int len) {
 	strncpy(segptr + mv, text, len);
 }
-void zeroshm(int shmid, int mv, int len) {
-	char *segptr = openshm(shmid);
+void zeroshm(char *segptr, int mv, int len) {
 	bzero(segptr + mv, len);
 }
-char *readshm(int shmid, int mv, int len) {
-	char *segptr = openshm(shmid);
+char *readshm(char *segptr, int mv, int len) {
 	char *buf = (char *)malloc(len + 1);
 	if(buf == NULL) {
 		fprintf(stderr, "t_shm readshm: malloc failed\n");

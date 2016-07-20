@@ -8,10 +8,10 @@
 #define sigma_size 128
 
 void t_trie_init();
-int t_trie_getval(int shmid, int i, int j, int k);
-void t_trie_setval(int shmid, int i, int j, int k, int v);
+int t_trie_getval(char *segptr, int i, int j, int k);
+void t_trie_setval(char *segptr, int i, int j, int k, int v);
 int t_trie_idx(char c);
-int t_trie_insert(char *name, int len);
+int t_trie_insert(char *segptr, char *name, int len);
 void t_trie_free();
 
 #endif

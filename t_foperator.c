@@ -17,6 +17,12 @@ FILE *t_fopen(const char *file_path, const char *mode) {
 	return fp;
 }
 
+void t_fclose(FILE *fp) {
+	if(fclose(fp) == EOF) {
+		perror("t_flocse");
+		exit(1);
+	}
+}
 void t_fclear(const char *file_path) {
 	FILE *fp = t_fopen(file_path, "w");
 	if(fclose(fp) == -1) {
@@ -56,7 +62,12 @@ off_t t_fsize(char *file_path) {
 int t_ftype(char *file_path) {
 	struct stat tmp;
 	if(stat(file_path, &tmp) == -1) {
-		perror("t_ftype stat: ");
+		perror("t_ftyep stat");
+		FILE *fp = t_fopen("./log", "at+");
+		t_flock(fp);
+		fseek(fp, 0L, SEEK_END);
+		fprintf(fp, "%s\n", file_path);
+		t_funlock(fp);
 		exit(1);
 	}
 	return tmp.st_mode & S_IFMT;

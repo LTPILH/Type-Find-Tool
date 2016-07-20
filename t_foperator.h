@@ -7,11 +7,13 @@
 
 #define T_FILE_PATH_INDEX "./t_file_path_index"
 #define FILE_NOEXIST -1
-#define LINESIZE 100
+#define LINESIZE 200
 
 int t_fexist(const char *file_path);
 
 FILE *t_fopen(const char *file_path, const char *mode);
+
+void t_fclose(FILE*);
 
 void t_fclear(const char *file_path);
 

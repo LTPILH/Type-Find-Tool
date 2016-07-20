@@ -11,12 +11,11 @@
 
 #define SEGSIZE 20000000 
 
-int excrshm(key_t key);
 int getshm(key_t key);
 char *openshm(int shmid);
-void writeshm(int shmid, int mv, char *text, int len);
-void zeroshm(int shmid, int mv, int len);
-char *readshm(int shmid, int mv, int len);
+void writeshm(char *segptr, int mv, char *text, int len);
+void zeroshm(char *segptr, int mv, int len);
+char *readshm(char *segptr, int mv, int len);
 int getsize(int shmid);
 void removeshm(int shmid);
 
