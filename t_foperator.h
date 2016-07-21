@@ -33,4 +33,7 @@ void t_flock(FILE *fp);
 
 void t_funlock(FILE *fp);
 
+char *t_fparse_h(char *hname);
+
+int getword(char *word, int *len, char *sentence, int n);
 #endif
