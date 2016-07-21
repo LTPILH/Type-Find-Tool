@@ -37,6 +37,7 @@ void t_fbuild(char *pathname) {
 	}
 	else if(t_ftype(pathname) == S_IFREG && len >= 3 && pathname[len - 2] == '.' && (pathname[len - 1] == 'c' || pathname[len - 1] == 'h')) {
 		//printf("%s\n", pathname);
+		t_wordparse(pathname);
 	}
 	else { 
 		//printf("%s\n", pathname);
