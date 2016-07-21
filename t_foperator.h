@@ -5,7 +5,7 @@
 #include <sys/file.h>
 #include <stdio.h>
 
-#define T_FILE_PATH_INDEX "./t_file_path_index"
+#define T_FILE_PATH_INDEX "./t_filelist"
 #define FILE_NOEXIST -1
 #define LINESIZE 200
 
@@ -33,7 +33,4 @@ void t_flock(FILE *fp);
 
 void t_funlock(FILE *fp);
 
-char *t_fparse_h(char *hname);
-
-int getword(char *word, int *len, char *sentence, int n);
 #endif

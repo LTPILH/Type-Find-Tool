@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include "t_foperator.h"
+#include <ctype.h>
 #include <string.h>
 
 int t_fexist(const char *file_path) {
@@ -98,44 +99,3 @@ void t_funlock(FILE *fp) {
 	}
 }
 
-char *t_fparse_h(char *hname) {
-	char path[LINESIZE];
-	char cmd[30];
-	snprintf(cmd, 30, "locate %s", hname);
-	FILE *pp = popen(cmd, "r");
-	if(pp == NULL) {
-		perror("popen");
-		return;
-	}
-	while(fgets(path, LINESIZE, pp) != NULL) {
-		int pathlen = strlen(path);
-		path[--pathlen] = '\0';
-		if(t_fexist(path) == 0) {
-			if(pclose(pp) == -1) {
-				perror("pclose");
-			}
-			return path;
-		}
-	}
-	if(pclose(pp) == -1) {
-		perror("pclose");
-	}
-	fprintf(stderr, "Can't find head file: %s\n", hname);
-	return NULL;
-}
-
-int getword(char *word, int *len, char *sentence, int n) {
-	int sz = 0, i;
-	for(i = 0; i < n; i++) {
-		if(sentence[i] == ' ' || sentence[i] == '\n' || sentence[i] == '\t') {
-			if(sz == 0) continue;
-			word[sz] = '\0';
-			(*len) = sz;
-			return i;
-		}
-		word[sz++] = sentence[i];
-	}
-	word[sz] = '\0';
-	(*len) = sz;
-	return n;
-}
