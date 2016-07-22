@@ -38,16 +38,15 @@ void t_blinkshm(const char *segptr) {
 
 void t_readshm(char *segptr, int mv, char *text, int len) {
 	strncpy(text, segptr + mv, len);
-	text[len] = '\0';
+	//text[len] = '\0';
 }
 
 void t_writeshm(char *segptr, int mv, char *text, int len) {
 	strncpy(segptr + mv, text, len);
 }
 
-void t_clearshm(char *segptr, int mv, int len) {
+void t_clearshm(char *const segptr, int mv, int len) {
 	bzero(segptr + mv, len);
-	printf("t_clearshm end\n");
 }
 
 int t_getsize(int shmid) {

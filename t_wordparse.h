@@ -1,7 +1,7 @@
 #ifndef __T_WORDPARSE_H_
 #define __T_WORDPARSE_H_
 
-void t_wordparse(char *pathname);
+void t_wordparse(char *pathname, char *segptr);
 
 int t_gethfile(char *path, char *hname);
 

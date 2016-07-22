@@ -1,8 +1,9 @@
 #include "t_wordparse.h"
 #include "t_foperator.h"
+#include "t_trie.h"
 #include <string.h>
 
-void t_wordparse(char *path) {
+void t_wordparse(char *path, char *segptr) {
 	FILE *fp = t_fopen(path, "rt");
 	FILE *tp = t_fopen(TYFDS, "at");
 	FILE *lp = t_fopen(T_FILELIST, "at");
@@ -20,10 +21,13 @@ void t_wordparse(char *path) {
 			while(l <= r) pline[pplen++] = line[l++];
 			pline[pplen] = '\0';
 			if((plen = t_gethfile(line, pline)) > 0) {
-				t_flock(lp);
-				fseek(lp, 0L, SEEK_END);
-				t_fwrite(line, sizeof(char), plen, lp);
-				t_funlock(lp);
+				int exist = t_trie_insert(segptr, line, plen - 1);
+				if(exist == 0) {
+					t_flock(lp);
+					fseek(lp, 0L, SEEK_END);
+					t_fwrite(line, sizeof(char), plen, lp);
+					t_funlock(lp);
+				}
 			}
 		}
 		else if((l = t_beginwith(line, plen, "#define", 7)) >= 0) {

@@ -23,7 +23,7 @@ void t_readshm(char *segptr, int mv, char *text, int len);
 
 void t_writeshm(char *segptr, int mv, char *text, int len);
 
-void t_clearshm(char *segptr, int mv, int len);
+void t_clearshm(char *const segptr, int mv, int len);
 
 int t_getsize(int shmid);
 

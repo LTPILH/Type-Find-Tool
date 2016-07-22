@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 				exit(0);
 			}
 			else {
-				//fprintf(stderr, "Create : %d, path=%s, all_son=%d, ftell=%d\n", pid, pathname, all_son, ftell(idxfp));
+				//fprintf(stderr, "Create : %d, path=%s, all_son=%d, ftell=%d\n", pid, pathname, all_son, ftell(lp));
 				char *ptr;
 				do {
 					//t_flock(idxfp);

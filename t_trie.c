@@ -34,7 +34,7 @@ int t_trie_idx(char c) {
 	return (int)c;
 }
 
-int t_trie_insert(char *segptr, char *name, int len) { // -1 exist
+int t_trie_insert(char *const segptr, char *name, int len) { // -1 exist
 	if(len <= 0) return -1;
 	int i, u = 0;
 	key_t key = ftok(".", 's');
@@ -52,9 +52,7 @@ int t_trie_insert(char *segptr, char *name, int len) { // -1 exist
 			u = v;
 			continue;
 		}
-		fprintf(stderr, "In %x\n", segptr);
 		t_clearshm(segptr, sizeof(int) * (1 + sz * NODENUM * 2), NODESIZE);
-		fprintf(stderr, "Out\n");
 		t_trie_setval(segptr, mv, sz);
 		u = sz++;
 	}
