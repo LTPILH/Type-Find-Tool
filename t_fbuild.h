@@ -4,9 +4,8 @@
 #include "t_foperator.h"
 #include "t_trie.h"
 #include <unistd.h>
-#include <dirent.h>
 #include <signal.h>
 
-void t_fbuild(char *pathname);
+void t_fbuild(char *pathname, char *segptr);
 
 #endif

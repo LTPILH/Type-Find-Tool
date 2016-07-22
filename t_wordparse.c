@@ -5,9 +5,10 @@
 void t_wordparse(char *path) {
 	FILE *fp = t_fopen(path, "rt");
 	FILE *tp = t_fopen(TYFDS, "at");
-	FILE *lp = t_fopen(T_FILE_PATH_INDEX, "at");
+	FILE *lp = t_fopen(T_FILELIST, "at");
 	char line[LINESIZE], pline[LINESIZE], result[LINESIZE << 1];
-	while(fgets(line, LINESIZE, fp) != NULL) {
+
+	while(t_freadline(line, LINESIZE, fp) != NULL) {
 		int plen = strlen(line);
 		int l = 0, r = plen - 1;
 		if((l = t_beginwith(line, plen, "#include", 8)) >= 0) {
@@ -63,7 +64,7 @@ int t_gethfile(char *path, char *hname) {
 		perror("popen");
 		return -1;
 	}
-	while(fgets(path, LINESIZE, pp) != NULL) {
+	while(t_freadline(path, LINESIZE, pp) != NULL) {
 		int pathlen = strlen(path);
 		if(t_fexist(path) == FILE_NOEXIST) {
 			if(pclose(pp) == -1) {

@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define SEM_RESOURCE_MAX 1
+#define SEM_RESOURCE_MAX 2000
 #define SEMMSL 1
 
 union semun
@@ -16,12 +16,16 @@ union semun
 	struct seminfo *__buf;		// buffer for IPC_INFO
 };
 
-void opensem(int *sid, key_t key);
-void createsem(int *sid, key_t key, int members);
-void locksem(int sid, int member);
-void unlocksem(int sid, int member);
-void removesem(int sid);
-unsigned short get_member_count(int sid);
-int getval(int sid, int member);
+void t_createsem(int *sid, key_t key, int members, int semval);
+
+void t_opensem(int *sid, key_t key);
+
+void t_locksem(int sid, int member);
+
+void t_unlocksem(int sid, int member);
+
+void t_removesem(int sid);
+
+unsigned short t_get_member_count(int sid);
 
 #endif

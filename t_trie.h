@@ -4,14 +4,22 @@
 #include "t_sem.h"
 #include "t_shm.h"
 
-#define maxnode 20000
-#define sigma_size 128
+#define MAXNODE 20000
+#define NODENUM 128
+#define NODESIZE (sizeof(int) * NODENUM * 2)
 
-void t_trie_init();
-int t_trie_getval(char *segptr, int i, int j, int k);
-void t_trie_setval(char *segptr, int i, int j, int k, int v);
+char *t_trie_init();
+
+int t_trie_getmv(int id, int num, int type);
+
+int t_trie_getval(char *segptr, int mv);
+
+void t_trie_setval(char *segptr, int mv, int val);
+
 int t_trie_idx(char c);
+
 int t_trie_insert(char *segptr, char *name, int len);
+
 void t_trie_free();
 
 #endif
