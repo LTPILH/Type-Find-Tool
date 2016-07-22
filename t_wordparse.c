@@ -27,7 +27,7 @@ void t_wordparse(char *path) {
 		}
 		else if((l = t_beginwith(line, plen, "#define", 7)) >= 0) {
 			int pplen = t_trim(pline, line + 7, plen - 7);
-			int sz = snprintf(result, LINESIZE << 1, "%-100s <--- %s\n", pline, path);
+			int sz = snprintf(result, LINESIZE << 1, "%-50s <--- %s\n", pline, path);
 			t_flock(tp);
 			fseek(tp, 0L, SEEK_END);
 			t_fwrite(result, sizeof(char), sz, tp);
@@ -35,7 +35,7 @@ void t_wordparse(char *path) {
 		}
 		else if((l = t_beginwith(line, plen, "typedef", 7)) >= 0) {
 			int pplen = t_trim(pline, line + 7, plen - 7);
-			int sz = snprintf(result, LINESIZE << 1, "%-100s <--- %s\n", pline, path);
+			int sz = snprintf(result, LINESIZE << 1, "%-50s <--- %s\n", pline, path);
 			t_flock(tp);
 			fseek(tp, 0L, SEEK_END);
 			t_fwrite(result, sizeof(char), sz, tp);
@@ -43,7 +43,7 @@ void t_wordparse(char *path) {
 		}
 		else if((l = t_beginwith(line, plen, "struct", 6)) >= 0) {
 			int pplen = t_trim(pline, line + 6, plen - 6);
-			int sz = snprintf(result, LINESIZE << 1, "%-100s <--- %s\n", pline, path);
+			int sz = snprintf(result, LINESIZE << 1, "%-50s <--- %s\n", pline, path);
 			t_flock(tp);
 			fseek(tp, 0L, SEEK_END);
 			t_fwrite(result, sizeof(char), sz, tp);

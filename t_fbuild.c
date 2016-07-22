@@ -3,6 +3,7 @@
 void t_fbuild(char *pathname) {
 	int len = strlen(pathname);
 	FILE *idxfp = t_fopen(T_FILE_PATH_INDEX, "at");
+	printf("Reading %s ...\n", pathname);
 	if(t_ftype(pathname) == S_IFDIR) {
 		DIR *pdir;
 		struct dirent *pdirent;
