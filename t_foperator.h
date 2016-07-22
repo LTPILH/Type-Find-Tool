@@ -5,6 +5,7 @@
 #include <sys/file.h>
 #include <stdio.h>
 
+#define TYFDS "./tyfds"
 #define T_FILE_PATH_INDEX "./t_filelist"
 #define FILE_NOEXIST -1
 #define LINESIZE 200

@@ -4,8 +4,10 @@
 
 CFLAGS=-g
 
-tman:t_man.o t_trie.o t_sem.o t_shm.o t_foperator.o t_fbuild.o
+tman:t_man.o t_trie.o t_sem.o t_shm.o t_foperator.o t_fbuild.o t_wordparse.o
 	gcc -o tman $^
+
+t_wordparse.o:t_wordparse.c
 
 t_fbuild.o:t_fbuild.c
 

@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
 		void sig_chld(int);
 		signal(SIGCHLD, sig_chld);
 		t_fclear(T_FILE_PATH_INDEX);
+		t_fclear(TYFDS);
 		FILE *idxfp = t_fopen(T_FILE_PATH_INDEX, "rt");
 		t_trie_init();
 		char pathname[LINESIZE];

@@ -1,7 +1,12 @@
-#include "t_foperator.h"
+#ifndef __T_WORDPARSE_H_
+#define __T_WORDPARSE_H_
 
 void t_wordparse(char *pathname);
 
-char *t_fparse_h(char *hname);
+int t_gethfile(char *path, char *hname);
 
-int getword(char *word, int *len, char *sentence, int n);
+int t_beginwith(char *s, int slen, char *p, int plen);
+
+int t_trim(char *dst, char *src, int len);
+
+#endif
