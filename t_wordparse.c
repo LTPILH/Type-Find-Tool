@@ -13,6 +13,10 @@ void t_wordparse(char *path, char *segptr) {
 	while(t_freadline(line, LINESIZE, fp) != NULL) {
 		if((ptr = t_trim(line)) == NULL) continue;
 		int len = strlen(ptr), mv;
+		t_flock(tp);
+		fseek(tp, 0L, SEEK_END);
+		t_fwrite(ptr, 1, len, tp);
+		t_funlock(tp);
 		if((mv = t_beginwith(ptr, len, "#include", 8)) >= 0) {
 			if(t_get_inc(pline, ptr) == -1) continue;
 			if((len = t_gethfile(line, pline)) != -1) {
@@ -20,7 +24,7 @@ void t_wordparse(char *path, char *segptr) {
 				if(exist == 0) {
 					t_flock(lp);
 					fseek(lp, 0L, SEEK_END);
-					t_fwrite(line, 1, len, lp);
+					//t_fwrite(line, 1, len, lp);
 					t_funlock(lp);
 				}
 			}
@@ -124,14 +128,14 @@ int t_get_def(char *dst, char *src) {
 	int i, sz = 0, slen = strlen(src);
 	dst[sz++] = '<'; dst[sz++] = 'D'; dst[sz++] = '>'; dst[sz++] = ' ';
 	for(i = 0; i < slen; i++) {
-		if(src[i] != ' ' && src[i] != '\t') break;
+		if(t_isid(src[i])) break;
 	}
 	if(i == slen) return -1;
 	while(i < slen && t_isid(src[i])) {
 		dst[sz++] = src[i++];
 	}
-	while(i < slen && src[i] != ' ' && src[i] != '\t') i++;
-	if(i == slen || !t_isid(src[i])) return -1;
+	while(i < slen && !t_isid(src[i])) i++;
+	if(i == slen) return -1;
 	dst[sz] = '\0';
 	return sz;
 }
