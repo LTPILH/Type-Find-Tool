@@ -57,10 +57,12 @@ int t_trie_insert(char *const segptr, char *name, int len) { // -1 exist
 		u = sz++;
 	}
 	t_trie_setval(segptr, 0, sz);
-	int cnt = t_trie_getval(segptr, mv + 1);
-	t_trie_setval(segptr, mv + 1, cnt + 1);
+	mv = t_trie_getmv(u, c, 1);
+	int cnt = t_trie_getval(segptr, mv);
+	int exist = (cnt == 0 ? 0 : -1);
+	t_trie_setval(segptr, mv, cnt + 1);
 	t_unlocksem(semid, 0);
-	return (cnt == 0 ? 0 : -1);
+	return exist;
 }
 
 void t_trie_free(char *segptr) {

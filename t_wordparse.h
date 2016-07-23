@@ -7,6 +7,18 @@ int t_gethfile(char *path, char *hname);
 
 int t_beginwith(char *s, int slen, char *p, int plen);
 
-int t_trim(char *dst, char *src, int len);
+char *t_trim(char *src);
+
+int t_isid(char ch);
+
+int t_get_inc(char *dst, char *src);
+
+int t_get_def(char *dst, char *src);
+
+int t_get_tef(char *dst, char *src);
+
+int t_get_stc(char *dst, char *src);
+
+int t_isfunc(char *dst, char *src, int len);
 
 #endif
