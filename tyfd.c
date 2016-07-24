@@ -23,10 +23,10 @@ int main(int argc, char *argv[]) {
 		char pathname[LINESIZE];
 		strncpy(pathname, argv[2], sizeof(pathname));
 		key_t key = ftok(".", 'm');
-		//t_createsem(&proc_lim, key, 1, 5000);
+		t_createsem(&proc_lim, key, 1, 150);
 
 		while(1) {
-			//t_locksem(proc_lim, 0);
+			t_locksem(proc_lim, 0);
 			int pathlen = strlen(pathname);
 			while(pathname[pathlen - 1] == '\n') pathname[--pathlen] = 0;
 			++all_son;
@@ -78,7 +78,7 @@ void sig_chld(int signo) {
 
 	while((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
 		++clo_son;
-		//t_unlocksem(proc_lim, 0);
+		t_unlocksem(proc_lim, 0);
 	}
 }
 void usage() {
