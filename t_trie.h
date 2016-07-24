@@ -5,7 +5,7 @@
 #include "t_shm.h"
 
 #define MAXNODE 20000
-#define NODENUM 128
+#define NODENUM 10
 #define NODESIZE (NODENUM * 2 * 4)
 
 char *t_trie_init();
@@ -18,7 +18,7 @@ void t_trie_setval(char *segptr, int mv, int val);
 
 int t_trie_idx(char c);
 
-int t_trie_insert(char *const segptr, char *name, int len);
+int t_trie_insert(char *const segptr, const char *name, int len);
 
 void t_trie_free();
 

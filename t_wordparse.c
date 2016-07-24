@@ -60,18 +60,22 @@ void t_wordparse(char *path, char *segptr) {
 }
 
 int t_gethfile(char *path, char *hname) {
-	char cmd[50];
-	snprintf(cmd, 50, "locate %s | grep ^/usr/include", hname);
+	char cmd[30];
+	snprintf(cmd, 30, "locate %s", hname);
 	FILE *pp = popen(cmd, "r");
 	if(pp == NULL) {
 		perror("popen");
 		return -1;
 	}
-	if(t_freadline(path, LINESIZE, pp) != NULL) {
-		int pathlen = strlen(path);
+	while(t_freadline(path, LINESIZE, pp) != NULL) {
+		int plen = strlen(path);
+		path[--plen] = '\0';
+		if(t_beginwith(path, plen, "/usr/include", 12) == -1) continue;
 		if(t_fexist(path) == 0) {
 			pclose(pp);
-			return pathlen;
+			path[plen++] = '\n';
+			path[plen] = '\0';
+			return plen;
 		}
 	}
 	pclose(pp);

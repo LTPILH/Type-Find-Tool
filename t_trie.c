@@ -1,4 +1,5 @@
 #include "t_trie.h"
+#include "t_foperator.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <strings.h>
@@ -31,11 +32,16 @@ void t_trie_setval(char *segptr, int mv, int val) {
 }
 
 int t_trie_idx(char c) {
-	return (int)c;
+	return c - '0';
 }
 
-int t_trie_insert(char *const segptr, char *name, int len) { // -1 exist
+int t_trie_insert(char *const segptr, const char *name, int len) { // -1 exist
 	if(len <= 0) return -1;
+	char path[LINESIZE];
+	strncpy(path, name, len);
+	path[len] = '\0';
+	long long ino = t_getinode(path);
+	int plen = snprintf(path, LINESIZE, "%lld", ino);
 	int i, u = 0;
 	key_t key = ftok(".", 's');
 	int semid;
@@ -44,8 +50,8 @@ int t_trie_insert(char *const segptr, char *name, int len) { // -1 exist
 	t_readshm(segptr, 0, (char *)&sz, sizeof(int));
 	t_locksem(semid, 0);
 	int c = 0, mv;
-	for(i = 0; i < len; i++) {
-		c = t_trie_idx(name[i]);
+	for(i = 0; i < plen; i++) {
+		c = t_trie_idx(path[i]);
 		mv = t_trie_getmv(u, c, 0);
 		int v = t_trie_getval(segptr, mv);
 		if(v != 0) {
