@@ -1,0 +1,1 @@
+sudo bash install.sh
