@@ -3,12 +3,15 @@
 #include "t_trie.h"
 #include <string.h>
 
+
 void t_wordparse(char *path, char *segptr) {
 	FILE *fp = t_fopen(path, "rt");
 	FILE *tp = t_fopen(TYFDS, "at");
 	FILE *lp = t_fopen(T_FILELIST, "at");
 	char line[LINESIZE], pline[LINESIZE], result[LINESIZE << 1];
 	char *ptr;
+	char pattern[20];
+	int pattlen = 0;
 
 	while(t_freadline(line, LINESIZE, fp) != NULL) {
 		if((ptr = t_trim(line)) == NULL) continue;
@@ -28,12 +31,19 @@ void t_wordparse(char *path, char *segptr) {
 		}
 		else if((mv = t_beginwith(ptr, len, "#define", 7)) >= 0) {
 			if(t_get_def(pline, ptr + mv + 1) == -1) continue;
+			if(t_endwith(ptr, len, "typedef", 7) >= 0) {
+				strncpy(pattern, pline + 4, strlen(pline) - 4);
+				pattlen = 1;
+			}
 		}
 		else if((mv = t_beginwith(ptr, len, "typedef", 7)) >= 0) {
 			if(t_get_tef(pline, ptr + mv + 1) == -1) continue;
 		}
 		else if((mv = t_beginwith(ptr, len, "struct", 6)) >= 0) {
 			if(t_get_stc(pline, ptr + mv + 1) == -1) continue;
+		}
+		else if(pattlen > 0 && (mv = t_beginwith(ptr, len, pattern, strlen(pattern)) >= 0)) {
+			if(t_get_tef(pline, ptr + mv + 1) == -1) continue;
 		}
 		else if(t_isfunc(pline, ptr, len) == -1) {
 			continue;
@@ -88,6 +98,17 @@ int t_beginwith(char *s, int slen, char *p, int plen) {
 	return -1;
 }
 
+int t_endwith(char *s, int slen, char *p, int plen) {
+	int i = slen - 1, j = plen - 1;
+	while(i >= 0) {
+		if(s[i] != p[j]) return -1;
+		i--;
+		j--;
+		if(j == -1) return i + 1;
+	}
+	return -1;
+}
+
 int t_isid(char ch) {
 	return (isalpha(ch) || isdigit(ch) || (ch == '_'));
 }
@@ -95,7 +116,7 @@ int t_isid(char ch) {
 char *t_trim(char *src) {
 	int len = strlen(src);
 	while(len > 0 && (src[len - 1] == ' ' || src[len - 1] == '\t' || src[len - 1] == '\n')) len--;
-	src[++len] = '\0';
+	src[len] = '\0';
 	int i;
 	for(i = 0; i < len; i++) {
 		if(src[i] != ' ' && src[i] != '\t' && src[i] != '\n')

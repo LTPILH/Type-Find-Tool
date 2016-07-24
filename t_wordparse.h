@@ -7,6 +7,8 @@ int t_gethfile(char *path, char *hname);
 
 int t_beginwith(char *s, int slen, char *p, int plen);
 
+int t_endwith(char *s, int slen, char *p, int plen);
+
 char *t_trim(char *src);
 
 int t_isid(char ch);
