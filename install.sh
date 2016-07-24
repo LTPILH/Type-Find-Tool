@@ -6,4 +6,4 @@ make
 
 make clean
 
-mv tyfd /usr/local/tyfd
+mv tyfd /usr/bin/tyfd
