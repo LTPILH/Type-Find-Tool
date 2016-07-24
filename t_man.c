@@ -5,13 +5,11 @@
 
 void usage();
 int clo_son, all_son;
+int proc_lim;
 
 int main(int argc, char *argv[]) {
-	if(argc == 1) usage();
-	if(strncmp(argv[1], "-h", 2) == 0) usage();
-	if(strncmp(argv[1], "-b", 2) == 0) {
-		if(argc != 3) usage();
-
+	if(argc == 2 && strncmp(argv[1], "-h", 2) == 0) usage();
+	else if(argc == 3 && strncmp(argv[1], "-b", 2) == 0) {
 		void sig_chld(int);
 		signal(SIGCHLD, sig_chld);
 
@@ -24,8 +22,11 @@ int main(int argc, char *argv[]) {
 		char *segptr = t_trie_init();
 		char pathname[LINESIZE];
 		strncpy(pathname, argv[2], sizeof(pathname));
+		key_t key = ftok(".", 'm');
+		//t_createsem(&proc_lim, key, 1, 5000);
 
 		while(1) {
+			//t_locksem(proc_lim, 0);
 			int pathlen = strlen(pathname);
 			while(pathname[pathlen - 1] == '\n') pathname[--pathlen] = 0;
 			++all_son;
@@ -42,18 +43,12 @@ int main(int argc, char *argv[]) {
 				exit(0);
 			}
 			else {
-				//fprintf(stderr, "Create : %d, path=%s, all_son=%d, ftell=%d\n", pid, pathname, all_son, ftell(lp));
 				char *ptr;
 				do {
-					//t_flock(idxfp);
 					ptr = t_freadline(pathname, LINESIZE, lp);
-					//printf("Before clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
-					//ptr = fgets(pathname, LINESIZE, idxfp);
-					//t_funlock(idxfp);
 					if(ptr == NULL) {
-						//printf("clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
 						if(clo_son < all_son) {
-							sleep(500);
+							sleep(300);
 						}
 						else {
 							t_trie_free(segptr);
@@ -61,24 +56,35 @@ int main(int argc, char *argv[]) {
 							exit(0);
 						}
 					}
-					//printf("After clo_son=%d, all_son=%d, ftell=%d\n", clo_son, all_son, ftell(idxfp));
 				}while(ptr == NULL);
-				//fprintf(stderr, "Readline : %s\n", pathname);
 			}
 		}
 	}
+	else if(argc == 2) {
+		char cmd[50], result[LINESIZE];
+		snprintf(cmd, 50, "grep -A1 '<.>[^<]*%s' tyfds", argv[1]);
+		FILE *pp;
+		if((pp = popen(cmd, "r")) == NULL) {
+			perror("popen");
+			exit(1);
+		}
+		while(t_freadline(result, LINESIZE, pp) != NULL)
+			printf("%s", result);
+	}
+	else usage();
 }
 void sig_chld(int signo) {
 	pid_t pid;
 
 	while((pid = waitpid(-1, NULL, WNOHANG)) > 0) {
 		++clo_son;
+		//t_unlocksem(proc_lim, 0);
 	}
 }
 void usage() {
 	fprintf(stderr, "tman - A type find tool\n");
 	fprintf(stderr, "\nUSAGE: tman -b <filepath>\n");
 	fprintf(stderr, "       -h\n");
-	fprintf(stderr, "       <type> <filepath>\n");
+	fprintf(stderr, "       <type>\n");
 	exit(1);
 }

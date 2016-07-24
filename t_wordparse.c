@@ -188,16 +188,31 @@ int t_get_stc(char *dst, char *src) {
 }
 
 int t_isfunc(char *dst, char *src, int len) {
-	int cnt = 0, i, sz = 0;
+	int i, sz = 0;
 	dst[sz++] = '<'; dst[sz++] = 'F'; dst[sz++] = '>'; dst[sz++] = ' ';
-	for(i = 1; i < len; i++) {
-		if(!t_isid(src[i]) && t_isid(src[i - 1]))
-			cnt++;
-		if(src[i] == '(') break;
+	for(i = 0; i < len; i++) {
+		if(src[i] == ' ' || src[i] == '\t') break;
+		if(!t_isid(src[i]) && src[i] != '*') return -1;
 	}
-	if(i == len || cnt != 2) return -1;
-	for( ; i < len && src[i] != ')'; i++);
+	for( ; i < len; i++) {
+		if(src[i] == ' ' || src[i] == '\t') continue;
+		break;
+	}
 	if(i == len) return -1;
+	int cnt = 0;
+	while(i < len) {
+		if(t_isid(src[i]) || src[i] == '*' || src[i] == ' ' || src[i] == '\t') {
+			i++;
+			continue;
+		}
+		if(src[i] == '(') cnt++;
+		else if(src[i] == ')') {
+			cnt--;
+			if(cnt == 0) break;
+		}
+		else return -1;
+		i++;
+	}
 	int j;
 	for(j = 0; j <= i; j++) dst[sz++] = src[j];
 	dst[sz] = '\0';

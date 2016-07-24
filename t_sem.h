@@ -4,6 +4,7 @@
 #include <sys/sem.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <errno.h>
 
 #define SEM_RESOURCE_MAX 2000
 #define SEMMSL 1

@@ -42,7 +42,10 @@ void t_locksem(int sid, int member) {
 		return;
 	}
 	sem_lock.sem_num = member;
-	if((semop(sid, &sem_lock, 1)) == -1) {
+	while((semop(sid, &sem_lock, 1)) == -1) {
+		if(errno == EINTR) {
+			continue;
+		}
 		perror("t_locksem - semop");
 		//fprintf(stderr, "t_locksem:Lock failed\n");
 		exit(1);
@@ -57,7 +60,10 @@ void t_unlocksem(int sid, int member) {
 		return;
 	}
 	sem_unlock.sem_num = member;
-	if((semop(sid, &sem_unlock, 1)) == -1) {
+	while((semop(sid, &sem_unlock, 1)) == -1) {
+		if(errno == EINTR) {
+			continue;
+		}
 		perror("t_unlocksem - semop");
 		exit(1);
 	}
