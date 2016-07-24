@@ -65,11 +65,6 @@ int t_isdir(char *file_path) {
 
 	if(stat(file_path, &tmp) == -1) {
 		perror("t_isdir");
-		FILE *fp = t_fopen("./log", "at");
-		t_flock(fp);
-		fseek(fp, 0L, SEEK_END);
-		fprintf(fp, "%s\n", file_path);
-		t_funlock(fp);
 		exit(1);
 	}
 	return (tmp.st_mode & S_IFMT) == S_IFDIR ? 1 : 0;
@@ -80,14 +75,19 @@ int t_isreg(char *file_path) {
 
 	if(stat(file_path, &tmp) == -1) {
 		perror("t_isreg");
-		FILE *fp = t_fopen("./log", "at");
-		t_flock(fp);
-		fseek(fp, 0L, SEEK_END);
-		fprintf(fp, "%s\n", file_path);
-		t_funlock(fp);
 		exit(1);
 	}
 	return (tmp.st_mode & S_IFMT) == S_IFREG ? 1 : 0;
+}
+
+ino_t t_getinode(char *file_path) {
+	struct stat tmp;
+
+	if(stat(file_path, &tmp) == -1) {
+		perror("t_getinode");
+		exit(1);
+	}
+	return tmp.st_ino;
 }
 
 void t_flock(FILE *fp) {

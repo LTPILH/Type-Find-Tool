@@ -31,6 +31,8 @@ int t_isdir(char *file_path);
 
 int t_isreg(char *file_path);
 
+ino_t t_getinode(char *file_path);
+
 void t_flock(FILE *fp);
 
 void t_funlock(FILE *fp);

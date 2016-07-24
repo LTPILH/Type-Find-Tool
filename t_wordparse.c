@@ -48,7 +48,7 @@ void t_wordparse(char *path, char *segptr) {
 		else if(t_isfunc(pline, ptr, len) == -1) {
 			continue;
 		}
-		int sz = snprintf(result, LINESIZE << 1, "%s\t<--- %s\n", pline, path);
+		int sz = snprintf(result, LINESIZE << 1, "%s\n\t<-- %s\n", pline, path);
 		t_flock(tp);
 		fseek(tp, 0L, SEEK_END);
 		t_fwrite(result, 1, sz, tp);
@@ -60,25 +60,21 @@ void t_wordparse(char *path, char *segptr) {
 }
 
 int t_gethfile(char *path, char *hname) {
-	char cmd[30];
-	snprintf(cmd, 30, "locate %s", hname);
+	char cmd[50];
+	snprintf(cmd, 50, "locate %s | grep ^/usr/include", hname);
 	FILE *pp = popen(cmd, "r");
 	if(pp == NULL) {
 		perror("popen");
 		return -1;
 	}
-	while(t_freadline(path, LINESIZE, pp) != NULL) {
+	if(t_freadline(path, LINESIZE, pp) != NULL) {
 		int pathlen = strlen(path);
-		if(t_fexist(path) == FILE_NOEXIST) {
-			if(pclose(pp) == -1) {
-				perror("pclose");
-			}
+		if(t_fexist(path) == 0) {
+			pclose(pp);
 			return pathlen;
 		}
 	}
-	if(pclose(pp) == -1) {
-		perror("pclose");
-	}
+	pclose(pp);
 	//fprintf(stderr, "Can't find head file: %s\n", hname);
 	return -1;
 }
