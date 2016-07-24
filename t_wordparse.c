@@ -13,10 +13,6 @@ void t_wordparse(char *path, char *segptr) {
 	while(t_freadline(line, LINESIZE, fp) != NULL) {
 		if((ptr = t_trim(line)) == NULL) continue;
 		int len = strlen(ptr), mv;
-		t_flock(tp);
-		fseek(tp, 0L, SEEK_END);
-		t_fwrite(ptr, 1, len, tp);
-		t_funlock(tp);
 		if((mv = t_beginwith(ptr, len, "#include", 8)) >= 0) {
 			if(t_get_inc(pline, ptr) == -1) continue;
 			if((len = t_gethfile(line, pline)) != -1) {
@@ -24,7 +20,7 @@ void t_wordparse(char *path, char *segptr) {
 				if(exist == 0) {
 					t_flock(lp);
 					fseek(lp, 0L, SEEK_END);
-					//t_fwrite(line, 1, len, lp);
+					t_fwrite(line, 1, len, lp);
 					t_funlock(lp);
 				}
 			}
@@ -42,8 +38,7 @@ void t_wordparse(char *path, char *segptr) {
 		else if(t_isfunc(pline, ptr, len) == -1) {
 			continue;
 		}
-		else continue;
-		int sz = snprintf(result, LINESIZE << 1, "%s  <---  %s\n", pline, path);
+		int sz = snprintf(result, LINESIZE << 1, "%s\t<--- %s\n", pline, path);
 		t_flock(tp);
 		fseek(tp, 0L, SEEK_END);
 		t_fwrite(result, 1, sz, tp);
@@ -175,12 +170,12 @@ int t_isfunc(char *dst, char *src, int len) {
 	int cnt = 0, i, sz = 0;
 	dst[sz++] = '<'; dst[sz++] = 'F'; dst[sz++] = '>'; dst[sz++] = ' ';
 	for(i = 1; i < len; i++) {
-		if(!t_isid(src[i]) && t_isid(src[i]))
+		if(!t_isid(src[i]) && t_isid(src[i - 1]))
 			cnt++;
 		if(src[i] == '(') break;
 	}
-	if(i == len || cnt < 2) return -1;
-	for(i; i < len && src[i] != ')'; i++);
+	if(i == len || cnt != 2) return -1;
+	for( ; i < len && src[i] != ')'; i++);
 	if(i == len) return -1;
 	int j;
 	for(j = 0; j <= i; j++) dst[sz++] = src[j];
