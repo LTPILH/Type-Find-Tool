@@ -3,6 +3,8 @@
 #include "t_fbuild.h"
 #include <signal.h>
 
+const int NP = 100;
+
 void usage();
 int clo_son, all_son;
 int proc_lim;
@@ -20,44 +22,48 @@ int main(int argc, char *argv[]) {
 		all_son = clo_son = 0;
 		FILE *lp = t_fopen(T_FILELIST, "rt");
 		char *segptr = t_trie_init();
-		char pathname[LINESIZE];
-		strncpy(pathname, argv[2], sizeof(pathname));
+		char pathname[NP][LINESIZE];
+		int np = 0;
+		strncpy(pathname[np++], argv[2], strlen(argv[2]));
 		key_t key = ftok(".", 'm');
-		t_createsem(&proc_lim, key, 1, 150);
+		t_createsem(&proc_lim, key, 1, 200);
 
 		while(1) {
-			t_locksem(proc_lim, 0);
-			int pathlen = strlen(pathname);
-			while(pathname[pathlen - 1] == '\n') pathname[--pathlen] = 0;
-			++all_son;
-			pid = fork();
-			if(pid < 0) {
-				perror("tman - fork");
-				t_trie_free(segptr);
-				t_fclose(lp);
-				exit(1);
+			while(np--) {
+				t_locksem(proc_lim, 0);
+				int pathlen = strlen(pathname[np]);
+				while(pathname[np][pathlen - 1] == '\n') pathname[np][--pathlen] = 0;
+				++all_son;
+				pid = fork();
+				if(pid < 0) {
+					perror("tman - fork");
+					t_trie_free(segptr);
+					t_fclose(lp);
+					exit(1);
+				}
+				else if(pid == 0) {
+					t_fclose(lp);
+					t_fbuild(pathname[np], segptr);
+					exit(0);
+				}
 			}
-			else if(pid == 0) {
-				t_fclose(lp);
-				t_fbuild(pathname, segptr);
-				exit(0);
-			}
-			else {
-				char *ptr;
-				do {
-					ptr = t_freadline(pathname, LINESIZE, lp);
-					if(ptr == NULL) {
-						if(clo_son < all_son) {
-							sleep(300);
-						}
-						else {
-							t_trie_free(segptr);
-							t_fclose(lp);
-							exit(0);
-						}
+			np = 0;
+			char *ptr;
+			do {
+				ptr = t_freadline(pathname[np], LINESIZE, lp);
+				if(ptr == NULL) {
+					if(np) break;
+					if(clo_son < all_son) {
+						sleep(300);
 					}
-				}while(ptr == NULL);
-			}
+					else {
+						t_trie_free(segptr);
+						t_fclose(lp);
+						exit(0);
+					}
+				}
+				else np++;
+			}while(np < NP);
 		}
 	}
 	else if(argc == 2) {
