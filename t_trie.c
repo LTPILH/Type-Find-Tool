@@ -4,17 +4,18 @@
 #include <stdlib.h>
 #include <strings.h>
 
-char *t_trie_init() {
+int t_trie_init() {
 	key_t key = ftok(".", 's');
 	t_createshm(key);
-	int shmid = t_openshm(key);
+	int shmid = t_createshm(key);
 	char *segptr = t_linkshm(shmid);
 	int sz = 1;
 	t_writeshm(segptr, 0, (char *)&sz, sizeof(sz));
 	int semid;
 	t_createsem(&semid, key, 1, 1);
 	t_clearshm(segptr, sizeof(sz), NODESIZE);
-	return segptr;
+	t_blinkshm(segptr);
+	return shmid;
 }
 
 int t_trie_getmv(int id, int num, int type) {
@@ -44,11 +45,11 @@ int t_trie_insert(char *const segptr, const char *name, int len) { // -1 exist
 	int plen = snprintf(path, LINESIZE, "%lld", ino);
 	int i, u = 0;
 	key_t key = ftok(".", 's');
+	int sz;
 	int semid;
 	t_opensem(&semid, key);
-	int sz;
-	t_readshm(segptr, 0, (char *)&sz, sizeof(int));
 	t_locksem(semid, 0);
+	t_readshm(segptr, 0, (char *)&sz, sizeof(int));
 	int c = 0, mv;
 	for(i = 0; i < plen; i++) {
 		c = t_trie_idx(path[i]);
@@ -66,16 +67,14 @@ int t_trie_insert(char *const segptr, const char *name, int len) { // -1 exist
 	mv = t_trie_getmv(u, c, 1);
 	int cnt = t_trie_getval(segptr, mv);
 	int exist = (cnt == 0 ? 0 : -1);
-	t_trie_setval(segptr, mv, cnt + 1);
+	if(cnt == 0) t_trie_setval(segptr, mv, cnt + 1);
 	t_unlocksem(semid, 0);
 	return exist;
 }
 
-void t_trie_free(char *segptr) {
-	key_t key = ftok(".", 's');
-	int shmid = t_openshm(key);
-	t_blinkshm(segptr);
+void t_trie_free(int shmid) {
 	t_removeshm(shmid);
+	key_t key = ftok(".", 's');
 	int semid;
 	t_opensem(&semid, key);
 	t_removesem(semid);

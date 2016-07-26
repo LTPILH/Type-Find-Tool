@@ -21,12 +21,12 @@ int main(int argc, char *argv[]) {
 		int pid;
 		all_son = clo_son = 0;
 		FILE *lp = t_fopen(T_FILELIST, "rt");
-		char *segptr = t_trie_init();
+		int shmid = t_trie_init();
 		char pathname[NP][LINESIZE];
 		int np = 0;
 		strncpy(pathname[np++], argv[2], strlen(argv[2]));
 		key_t key = ftok(".", 'm');
-		t_createsem(&proc_lim, key, 1, 200);
+		t_createsem(&proc_lim, key, 1, 150);
 
 		while(1) {
 			while(np--) {
@@ -37,13 +37,15 @@ int main(int argc, char *argv[]) {
 				pid = fork();
 				if(pid < 0) {
 					perror("tman - fork");
-					t_trie_free(segptr);
+					t_trie_free(shmid);
 					t_fclose(lp);
 					exit(1);
 				}
 				else if(pid == 0) {
 					t_fclose(lp);
+					char *segptr = t_linkshm(shmid);
 					t_fbuild(pathname[np], segptr);
+					t_blinkshm(segptr);
 					exit(0);
 				}
 			}
@@ -57,12 +59,14 @@ int main(int argc, char *argv[]) {
 						sleep(300);
 					}
 					else {
-						t_trie_free(segptr);
+						t_trie_free(shmid);
 						t_fclose(lp);
 						exit(0);
 					}
 				}
-				else np++;
+				else {
+					np++;
+				}
 			}while(np < NP);
 		}
 	}
