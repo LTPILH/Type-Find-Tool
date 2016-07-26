@@ -191,8 +191,9 @@ int t_isfunc(char *dst, char *src, int len) {
 	int i, sz = 0;
 	dst[sz++] = '<'; dst[sz++] = 'F'; dst[sz++] = '>'; dst[sz++] = ' ';
 	int cnt = 0;
+	printf("path=%s\n", src);
 	for(i = 0; i < len; i++) {
-		if(src[i] == ' ' || src[i] == '\t') break;
+		if(src[i] == ' ' || src[i] == '\t' || src[i] == '(') break;
 		if(!t_isid(src[i]) && (cnt == 0 || src[i] != '*')) return -1;
 		if(t_isid(src[i])) cnt++;
 	}
@@ -204,15 +205,16 @@ int t_isfunc(char *dst, char *src, int len) {
 	cnt = 0;
 	int wds = 0, have = 0;
 	while(i < len) {
-		if(t_isid(src[i]) || src[i] == '*') {
+		if(t_isid(src[i]) || src[i] == '*' || src[i] == ',' || src[i] == '.') {
 			i++;
 			continue;
 		}
 		if(src[i] == ' ' || src[i] == '\t') {
-			if(i && t_isid(src[i - 1])) wds++;
+			if(i && t_isid(src[i - 1]) && !have) wds++;
 			i++;
 			continue;
 		}
+		printf("src[%d]=%c\n", i, src[i]);
 		if(src[i] == '(') {
 			cnt++;
 			have = 1;
@@ -225,10 +227,12 @@ int t_isfunc(char *dst, char *src, int len) {
 		i++;
 	}
 	if(cnt != 0 || have == 0 || wds > 2) return -1;
-	while(i < len && (src[i] == ' ' || src[i] == '\t')) i++;
-	if(i < len && (src[i] != ';' || src[i] != '{')) return -1;
 	int j;
 	for(j = 0; j <= i; j++) dst[sz++] = src[j];
 	dst[sz] = '\0';
+	i++;
+	while(i < len && (src[i] == ' ' || src[i] == '\t')) i++;
+	printf("src[%d]=%c, cnt=%d, wds=%d\n", i, src[i], cnt, wds);
+	if(i < len && (src[i] != ';' || src[i] != '{')) return -1;
 	return sz;
 }
