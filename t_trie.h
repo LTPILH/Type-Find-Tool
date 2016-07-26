@@ -4,11 +4,11 @@
 #include "t_sem.h"
 #include "t_shm.h"
 
-#define MAXNODE 20000
+#define MAXNODE 30000
 #define NODENUM 10
 #define NODESIZE (NODENUM * 2 * 4)
 
-char *t_trie_init();
+int t_trie_init();
 
 int t_trie_getmv(int id, int num, int type);
 

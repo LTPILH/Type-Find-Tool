@@ -4,7 +4,7 @@ void t_fbuild(char *pathname, char *segptr) {
 	int len = strlen(pathname);
 	FILE *lp = t_fopen(T_FILELIST, "at");
 
-	printf("Reading %s ...\n", pathname);
+	//printf("Reading %s ...\n", pathname);
 
 	if(t_isdir(pathname)) {
 		struct dirent *pdirent;

@@ -9,11 +9,9 @@
 #include <string.h>
 #include <unistd.h>
 
-#define SEGSIZE 20000000 
+#define SEGSIZE 3000000 
 
-void t_createshm(key_t key);
-
-int t_openshm(key_t key);
+int t_createshm();
 
 char *t_linkshm(int shmid);
 

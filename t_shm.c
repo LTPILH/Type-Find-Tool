@@ -1,21 +1,9 @@
 #include "t_shm.h"
 
-void t_createshm(key_t key) {
+int t_createshm() {
 	int shmid = -1;
-	if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
-		shmid = t_openshm(key);
-		t_removeshm(shmid);
-		if((shmid = shmget(key, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
-			perror("t_createshm");
-			exit(1);
-		}
-	}
-}
-
-int t_openshm(key_t key) {
-	int shmid;
-	if((shmid = shmget(key, SEGSIZE, 0)) == -1) {
-		perror("t_openeshm");
+	if((shmid = shmget(IPC_PRIVATE, SEGSIZE, IPC_CREAT | IPC_EXCL | 0666)) == -1) {
+		perror("t_createshm");
 		exit(1);
 	}
 	return shmid;
@@ -37,12 +25,11 @@ void t_blinkshm(const char *segptr) {
 }
 
 void t_readshm(char *segptr, int mv, char *text, int len) {
-	strncpy(text, segptr + mv, len);
-	//text[len] = '\0';
+	memcpy(text, segptr + mv, len);
 }
 
 void t_writeshm(char *segptr, int mv, char *text, int len) {
-	strncpy(segptr + mv, text, len);
+	memcpy(segptr + mv, text, len);
 }
 
 void t_clearshm(char *const segptr, int mv, int len) {
